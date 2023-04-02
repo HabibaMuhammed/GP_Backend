@@ -1,3 +1,4 @@
 # GP-backend
-npm install
-npm run dev
+To run project
+#npm install
+#npm run dev
