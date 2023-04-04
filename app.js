@@ -4,7 +4,11 @@ const bodyParser = require("body-parser");
 const usersRouter = require("./routers/Users");
 const labroute = require("./routers/lab");
 const dotenv = require("dotenv");
+const cors = require('cors');
+
 dotenv.config();
+app.use(cors());
+
 app.use(express.urlencoded({ extended: false }));
 app.use("/Container", express.static("./Container"));
 const connect_DB = require("./DB/Connection");

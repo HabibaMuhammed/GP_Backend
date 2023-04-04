@@ -18,66 +18,78 @@ const addLab = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
-const updateSolvedlab = async(req,res) =>{
+const numberOfSolvedLabs = async (req, res) => {
   try {
-    
+    const { user_id } = req.body;
+
+    const Solvedlab = await SolvedlabsModel.find({
+      user_id: req.loggedInUser._id,
+    });
+    const number = Solvedlab.length;
+
+    res.status(200).json({ numberOfSolvedLabs: number });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+const updateSolvedlab = async (req, res) => {
+  try {
     const { labid, flag } = req.body;
-    const Solvedlab = await SolvedlabsModel.findOne({ lab_id: labid,user_id:req.loggedInUser._id})
+    const Solvedlab = await SolvedlabsModel.findOne({
+      lab_id: labid,
+      user_id: req.loggedInUser._id,
+    });
     const lab = await LabsModel.findOne({ _id: labid });
-    
-    let  status = "Unsolved";
-   
-    if(lab.Flag == flag) {
-  
+    let status = "Unsolved";
+
+    if (lab.Flag == flag) {
       status = "Success";
-      await LabsModel.findByIdAndUpdate(labid,{numberofsolving:lab.numberofsolving+1});
-      
+      await LabsModel.findByIdAndUpdate(labid, {
+        numberofsolving: lab.numberofsolving + 1,
+      });
     } else {
       status = "Failed";
-     
     }
-  
-    await SolvedlabsModel.updateOne({_id:Solvedlab._id},
-     { Status: status
-    });
-    
+
+    await SolvedlabsModel.updateOne({ _id: Solvedlab._id }, { Status: status });
+
     res.status(200).json({ message: status });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
-}
+};
 const addSolvedlab = async (req, res) => {
   try {
-    
     const { labid, flag } = req.body;
-    const Solvedlab = await SolvedlabsModel.findOne({ lab_id: labid,user_id:req.loggedInUser._id})
-    if(Solvedlab)
-       return res.status(400).json({ message: "already solved"});
+    const Solvedlab = await SolvedlabsModel.findOne({
+      lab_id: labid,
+      user_id: req.loggedInUser._id,
+    });
+    if (Solvedlab) return updateSolvedlab(req, res);
     const lab = await LabsModel.findOne({ _id: labid });
-    
-    let  status = "Unsolved";
-   
-    if(lab.Flag == flag) {
-  
+    let status = "Unsolved";
+
+    if (lab.Flag == flag) {
       status = "Success";
-     
-      await LabsModel.findByIdAndUpdate(labid,{numberofsolving:lab.numberofsolving+1});
-    
+
+      await LabsModel.findByIdAndUpdate(labid, {
+        numberofsolving: lab.numberofsolving + 1,
+      });
     } else {
       status = "Failed";
-     
     }
-  
+
     await SolvedlabsModel.create({
       lab_id: labid,
       user_id: req.loggedInUser._id,
       Status: status,
     });
-    
+
     res.status(200).json({ message: status });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
 };
 
-module.exports = { addLab, addSolvedlab,updateSolvedlab };
+module.exports = { addLab, addSolvedlab, updateSolvedlab, numberOfSolvedLabs };
