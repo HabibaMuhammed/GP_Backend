@@ -75,7 +75,7 @@ let login = async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, "thisis");
   res.header("x-auth-token", token);
-  return res.status(200).json({ token });
+  return res.status(200).json({ token, name: user.firstName });
 };
 //DELETE
 module.exports = { register, getAll, updateUser, login };

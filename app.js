@@ -19,4 +19,4 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/api/user", usersRouter);
 
 app.use("/api/labs", labroute);
-app.listen(process.env.PORT, () => console.log("Listening on port 5001"));
+app.listen(5001, () => console.log("Listening on port 5001"));
