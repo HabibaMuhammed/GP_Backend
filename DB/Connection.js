@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connect_DB = async () => {
   return await mongoose
-    .connect(process.env.DATABASE_URI)
+    .connect('mongodb://localhost:27017')
     .then(() => {
       console.log(process.env.DATABASE_URI);
       console.log("Database Connected Successfuly");

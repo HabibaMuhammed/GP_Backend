@@ -20,8 +20,6 @@ const addLab = async (req, res) => {
 };
 const numberOfSolvedLabs = async (req, res) => {
   try {
-    const { user_id } = req.body;
-
     const Solvedlab = await SolvedlabsModel.find({
       user_id: req.loggedInUser._id,
     });
@@ -68,7 +66,10 @@ const addSolvedlab = async (req, res) => {
     });
     if (Solvedlab) return updateSolvedlab(req, res);
     const lab = await LabsModel.findOne({ _id: labid });
+
     let status = "Unsolved";
+    console.log(lab);
+    console.log(flag);
 
     if (lab.Flag == flag) {
       status = "Success";
