@@ -8,13 +8,5 @@ const storage = multer.diskStorage({
   },
 });
 
-// const fileFilter = (req, file, callback) => {
-//   if (
-//     path.extname(file.originalname) == "zip" ||
-//     path.extname(file.originalname) == "rar"
-//   ) {
-//     callback(null, true);
-//   } else callback("Invalid File Format", false);
-// };
 const upload = multer({ storage});
 module.exports = upload;

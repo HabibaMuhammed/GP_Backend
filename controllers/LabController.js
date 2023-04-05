@@ -1,19 +1,39 @@
 const LabsModel = require("../DB/models/LabsModel");
 const SolvedlabsModel = require("../DB/models/Solvedlabs");
-
-const addLab = async (req, res) => {
+let addedlabname;
+const addLab= async (req, res) => {
   try {
     if (!req.file) {
       return res.status(404).json({ message: "File not provided", error });
     }
-    const { name, diffculty, numberofsolving, Flag } = req.body;
-    var Containers = req.file.path;
+    const { name, diffculty, numberofsolving, Flag} = req.body;
+    var icon = req.file.path;
+  
 
-    const lab = { name, Containers, diffculty, numberofsolving, Flag };
+    const lab = { name, icon, diffculty, numberofsolving, Flag };
     let labs = await LabsModel.findOne({ name: req.body.name });
     if (labs) return res.status(400).json({ message: "Lab already exist" });
     await LabsModel.create(lab);
     return res.status(200).json({ message: "Lab is Added Successfuly" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+const addLabcontent= async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(404).json({ message: "File not provided", error });
+    }
+    const {name,header1,header1content,heaader2,header2content,heaader3,header3content,heaader4,header4content} = req.body;
+    
+    var Containers = req.file.path;
+
+    const lab = {Containers,header1,header1content,heaader2,header2content,heaader3,header3content,heaader4,header4content};
+    let labs = await LabsModel.findOne({ name: req.body.name });
+    if (!labs) return res.status(400).json({ message: "Lab aren't exist" });
+    await LabsModel.updateMany({ name:req.body.name}, lab);
+    
+    return res.status(200).json({ message: "Lab content is Added Successfuly" });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
@@ -92,4 +112,4 @@ const addSolvedlab = async (req, res) => {
   }
 };
 
-module.exports = { addLab, addSolvedlab, updateSolvedlab, numberOfSolvedLabs };
+module.exports = { addLab,addLabcontent,addSolvedlab, updateSolvedlab, numberOfSolvedLabs };

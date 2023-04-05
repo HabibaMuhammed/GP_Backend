@@ -7,6 +7,15 @@ const LabsSchema = new mongoose.Schema(
     numberofsolving: { type: Number, default: 0 },
     Diffculty: { type: String, default: "easy" },
     Flag: { type: String, required: true },
+    icon: {type:String},
+    header1: {type:String},
+    header1content:{type:String},
+    heaader2: {type:String},
+    header2content:{type:String},
+    heaader3: {type:String},
+    header3content:{type:String}, 
+    heaader4: {type:String},
+    header4content:{type:String},
   },
 
   { timestamps: true }
