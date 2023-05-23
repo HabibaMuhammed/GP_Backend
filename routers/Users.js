@@ -7,11 +7,13 @@ const {
   getCurrentUser,
 } = require("../middlewares/UserMW");
 
-router.get("/", UserController.getAll);
+//router.get("/", UserController.getAll);
 router.post("/register", validatorMiddleware, UserController.register);
-router.patch("/update", UserController.updateUser);
+router.patch("/update",getCurrentUser,UserController.updateUser);
 router.post("/login", AuthMW, UserController.login);
 router.get("/profile", getCurrentUser, (req, res) => {
   res.json({ name: req.user.firstName });
 });
+router.delete("/Delete",getCurrentUser,UserController.deleteUser);
+
 module.exports = router;

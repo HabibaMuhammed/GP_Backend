@@ -6,7 +6,7 @@ const authenticate = () => {
     try {
       const { authorization } = req.headers;
       if (!authorization) res.status(404).json({ message: "Token not Found" });
-      const decodedToken = jwt.verify(authorization, "thisis");
+      const decodedToken = jwt.verify(authorization, "grad2023");
       if (!decodedToken?.id) {
         return res.status(403).json({ message: "Invalid Token or In-valid Payload" });
       } else {
