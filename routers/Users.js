@@ -9,11 +9,12 @@ const {
 
 //router.get("/", UserController.getAll);
 router.post("/register", validatorMiddleware, UserController.register);
-router.patch("/update",getCurrentUser,UserController.updateUser);
+router.patch("/update", getCurrentUser, UserController.updateUser);
+router.patch("/updatePassword", getCurrentUser, UserController.updatePassword);
 router.post("/login", AuthMW, UserController.login);
 router.get("/profile", getCurrentUser, (req, res) => {
   res.json({ name: req.user.firstName });
 });
-router.delete("/Delete",getCurrentUser,UserController.deleteUser);
-
+router.delete("/Delete", getCurrentUser, UserController.deleteUser);
+router.get("/Recentlabs", getCurrentUser, UserController.fetchRecentChallenges);
 module.exports = router;

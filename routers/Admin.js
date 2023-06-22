@@ -9,8 +9,5 @@ const labcontroler = require("../controllers/AdminController");
 router.post(`/labname`, Uploadimage.single("icon"),handleMulterError1,labcontroler.addLab);
 router.post(`/labcontent`, Uploadcontainer.single("file"),handleMulterError2, labcontroler.addLabcontent);
 router.get("/Getlabs", labcontroler.getlabs);
-
-//router.patch("/Editlab",);
-
 router.delete("/Deletelab",labcontroler.deletelab);
 module.exports = router;

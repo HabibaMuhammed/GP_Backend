@@ -1,9 +1,10 @@
 const LabsModel = require("../DB/models/LabsModel");
+const SolvedlabsModel=require("../DB/models/Solvedlabs");
 const jwt = require("jsonwebtoken");
-const numberOfSolvedLabs = async (req, res) => {
+const numberOfSolvedLabs = async (req, res) => {  //zy recent challenge
   try {
     const Solvedlab = await SolvedlabsModel.find({
-      user_id: req.loggedInUser._id,
+      user_id: req.user._id,
     });
     const number = Solvedlab.length;
 
@@ -18,7 +19,7 @@ const updateSolvedlab = async (req, res) => {
     const { labid, flag } = req.body;
     const Solvedlab = await SolvedlabsModel.findOne({
       lab_id: labid,
-      user_id: req.loggedInUser._id,
+      user_id: req.user._id,
     });
     const lab = await LabsModel.findOne({ _id: labid });
     let status = "Unsolved";
@@ -41,18 +42,18 @@ const updateSolvedlab = async (req, res) => {
 };
 const addSolvedlab = async (req, res) => {
   try {
-    const { flag } = req.body;
-    const {labid} = req.labs.id;
+    const {labid,flag } = req.body;
+    
     const Solvedlab = await SolvedlabsModel.findOne({
       lab_id: labid,
-      user_id: req.loggedInUser._id,
+      user_id: req.user._id,
     });
+    
     if (Solvedlab) return updateSolvedlab(req, res);
     const lab = await LabsModel.findOne({ _id: labid });
 
     let status = "Unsolved";
-    //console.log(lab);
-    //console.log(flag);
+  
 
     if (lab.Flag == flag) {
       status = "Success";
@@ -66,20 +67,20 @@ const addSolvedlab = async (req, res) => {
 
     await SolvedlabsModel.create({
       lab_id: labid,
-      user_id: req.loggedInUser._id,
+      user_id: req.user._id,
       Status: status,
     });
 
     res.status(200).json({ message: status });
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
+    res.status(500).json({ message: "Internal Server Error ??", error });
   }
 };
 const Fetchlabs = async (req, res) => {
   try {
     let labs = await LabsModel.find().select({ name: 1, _id: 0 ,icon:1});
     if (!labs) return res.status(400).json({ message: "No Labs" });
-    res.status(200).json({ message: labs });
+    res.status(200).json({labs});
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }

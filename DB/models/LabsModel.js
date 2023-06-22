@@ -7,15 +7,9 @@ const LabsSchema = new mongoose.Schema(
     numberofsolving: { type: Number, default: 0 },
     Diffculty: { type: String, default: "easy" },
     Flag: { type: String, required: true },
-    icon: {type:String},
-    header1: {type:String},
-    header1content:{type:String},
-    header2: {type:String},
-    header2content:{type:String},
-    header3: {type:String},
-    header3content:{type:String}, 
-    header4: {type:String},
-    header4content:{type:String},
+    icon: { type: String },
+    headers: [{ type: mongoose.Schema.Types.String, default: [] }],
+    headers_content: [{ type: mongoose.Schema.Types.String, default: [] }],
   },
 
   { timestamps: true }

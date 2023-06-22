@@ -2,7 +2,7 @@ const User = require("../DB/models/UserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../DB/models/UserModel");
-// CREATE
+
 let register = async (req, res) => {
   try {
     if (
@@ -31,7 +31,7 @@ let register = async (req, res) => {
     return res.status(200).json({ msg: "registred successful" });
   } catch (err) {
     for (let e in err.errors) {
-      //error
+      
       res.status(403).json({ message: "bad request" });
     }
   }
@@ -54,15 +54,18 @@ let register = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-   const {name,email,Location,Birthday} = req.body;
-   const {id}=req.user;
-   console.log(id);
-   let user=await UserModel.updateOne({_id:id},{firstName:name,email,Location,Birthday});
-   console.log(user);
+    const { name, email, Location, Birthday } = req.body;
+    const { id } = req.user;
+    
+    let user = await UserModel.updateOne(
+      { _id: id },
+      { firstName: name, email, Location, Birthday }
+    );
+   
     if (user.matchedCount) {
       return res.status(200).json({ message: "User Updated" });
     }
-    res.status(404).json({message:"user not found"});
+    res.status(404).json({ message: "User not found" });
   } catch (error) {
     res.status(400).json(error.message);
   }
@@ -70,25 +73,52 @@ const updateUser = async (req, res) => {
 let login = async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (!user)
-    return res.status(400).json({ message: "Invalid mail or password" });
+    return res.status(400).json({ message: "User not registered" });
+
   const validPass = await bcrypt.compare(req.body.password, user.password);
   if (!validPass)
     return res.status(400).json({ message: "Invalid mail or password" });
 
-  const token = jwt.sign({ id: user._id }, "thisis");
+  const token = jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin },
+    process.env.TOKEN_SECRET
+  );
+
   res.header("x-auth-token", token);
   return res.status(200).json({ token, name: user.firstName });
 };
+const updatePassword = async (req, res) => {
+  try {
+    const { oldpass, newpass, confirm } = req.body;
+    const id = req.user._id;
+    let user = await User.findOne({ _id: id });
+    const validPass = await bcrypt.compare(oldpass, user.password);
+    if (!validPass)
+      return res.status(400).json({ message: "Invalid old password" });
+    if (newpass != confirm)
+      return res.status(400).json({ message: "Don't match" });
+    if(newpass.length<7)
+     return res.status(400).json({ message: "too short password" });
+    let salt = await bcrypt.genSalt(10);
+    let hashedPswd = await bcrypt.hash(newpass, salt);
+
+    user = await UserModel.updateOne({ _id: id }, { password: hashedPswd });
+
+    if (user.matchedCount) {
+      return res.status(200).json({ message: "Password updated successfully" });
+    }
+    res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+};
 //DELETE
 const deleteUser = async (req, res) => {
-
   const { id } = req.user.id;
-  
+
   try {
-    const user = await User.findOneAndRemove(
-      id
-    );
-    
+    const user = await User.findOneAndRemove(id);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -97,4 +127,30 @@ const deleteUser = async (req, res) => {
     res.status(403).json(error.message);
   }
 };
-module.exports = { register, updateUser, login, deleteUser };
+const fetchRecentChallenges = async (req, res) => {
+  const id = req.user._id;
+
+  try {
+    const recentlabs = await SolvedLabs.find({ user_id: id, Status: "Success" })
+      .select({
+        user_id: 0,
+        _id: 0,
+        Status: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+      })
+      .populate([{ path: "lab_id", select: { name: 1, icon: 1 } }]);
+    res.status(200).json({ recentlabs });
+  } catch (error) {
+    res.status(403).json(error.message);
+  }
+};
+module.exports = {
+  register,
+  updateUser,
+  login,
+  deleteUser,
+  fetchRecentChallenges,
+  updatePassword,
+};

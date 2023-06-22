@@ -76,7 +76,7 @@ const getlabs = async (req, res) => {
 };
 const deletelab = async (req, res) => {
   const name = req.body.name;
-  const lab= LabsModel.findOne({ name: name })
+  const lab = LabsModel.findOne({ name: name });
   console.log(lab);
   try {
     const labs = await LabsModel.findOneAndRemove(lab);
