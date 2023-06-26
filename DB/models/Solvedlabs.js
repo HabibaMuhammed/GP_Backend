@@ -6,9 +6,10 @@ const SolvedlabsSchema = new mongoose.Schema(
 
      user_id:{type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true},
      Status: { type: String, required: true,default:"Unsolved" },
+     time_stamps:{type:Date,default:new Date()}
   },
 
-  { timestamps: true }
+  
 );
 
 const SolvedlabsModel = mongoose.model("SolvedLabs", SolvedlabsSchema);

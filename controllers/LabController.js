@@ -78,7 +78,7 @@ const addSolvedlab = async (req, res) => {
 };
 const Fetchlabs = async (req, res) => {
   try {
-    let labs = await LabsModel.find().select({ name: 1, _id: 0 ,icon:1});
+    let labs = await LabsModel.find().select({ name: 1, _id: 1,icon:1});
     if (!labs) return res.status(400).json({ message: "No Labs" });
     res.status(200).json({labs});
   } catch (error) {
@@ -93,8 +93,8 @@ const searchLab = async (req, res) => {
       name: 1,
       _id: 0,
     });
-    if (!labs) return res.status(400).json({ message: "No Labs" });
-    res.status(200).json({ message: labs });
+    if (!labs) return res.status(400).json({ message: "No Lab with this name exist" });
+    res.status(200).json({ labs });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
@@ -107,9 +107,7 @@ const Fetchonelab = async (req, res) => {
       createdAt: 0,
       updatedAt: 0,
       __v: 0,
-      icon: 0,
       _id: 1,
-      Containers: 0,
       Flag: 0,
       numberofsolving: 0,
     });

@@ -17,4 +17,8 @@ router.get("/profile", getCurrentUser, (req, res) => {
 });
 router.delete("/Delete", getCurrentUser, UserController.deleteUser);
 router.get("/Recentlabs", getCurrentUser, UserController.fetchRecentChallenges);
+router.get("/Performance", getCurrentUser, UserController.Performance);
+router.patch("/sendCode" , UserController.sendCode)
+router.post("/Verified" , UserController.validateAuthcode)
+router.patch("/forgetPassword" , UserController.forgetPassword)
 module.exports = router;
