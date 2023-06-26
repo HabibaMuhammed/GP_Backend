@@ -25,14 +25,17 @@ const userSchema = new mongoose.Schema({
       message: "{VALUE} is not a strong password",
     },
   },
-  img: {
-    data: Buffer,
-    contentType: String,
-  },
+  Location:{
+    type: String,
+   },
+   Birthday:{
+    type:String,
+   },
   isAdmin: {
     type: Boolean,
     default: false,
   },
+  
 });
 
 //const User = mongoose.model("Users", userSchema);

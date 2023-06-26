@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
-//const handleMulterError = require("../middlewares/multerError");
-const auth = require("../middlewares/authentication");
-const Uploadcontainer = require("../utils/Uploadcontainer");
-const Uploadimage= require("../utils/Uploadimage");
+//const auth = require("../middlewares/authentication");
 const labcontroler = require("../controllers/LabController");
-
-router.post(`/lab`, Uploadimage.single("icon"), labcontroler.addLab);
-router.post(`/labcontent`, Uploadcontainer.single("file"), labcontroler.addLabcontent);
-router.post(`/evaluate`, auth(), labcontroler.addSolvedlab);
-router.post(`/updatelabstatus`, auth(), labcontroler.updateSolvedlab);
-router.get(`/number`, auth(), labcontroler.numberOfSolvedLabs);
-
+const {
+ 
+  getCurrentUser
+} = require("../middlewares/UserMW");
+//user
+router.post(`/evaluate`,getCurrentUser,labcontroler.addSolvedlab);
+router.post(`/updatelabstatus`, getCurrentUser, labcontroler.updateSolvedlab); //try to solve
+router.get(`/number`, getCurrentUser, labcontroler.numberOfSolvedLabs); //zy recent bs hena btrg3 number of solving bas
+router.get("/Fetchlabs", labcontroler.Fetchlabs);
+router.post("/Fetchlab", labcontroler.Fetchonelab);
+router.post("/Search", labcontroler.searchLab);
 module.exports = router;
