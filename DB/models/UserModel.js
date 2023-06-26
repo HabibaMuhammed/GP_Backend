@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  Authcode:{
+    type:String,
+    default:""
+  }
+  
   
 });
 
