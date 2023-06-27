@@ -99,12 +99,11 @@ const updatePassword = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const { id } = req.user.id;
-
+  const id = req.user.id;
   try {
-    const user = await User.findOneAndRemove(id);
 
-    if (!user) {
+    const user = await User.findByIdAndDelete(id);
+   if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json({ message: "User Deleted successfully" });
