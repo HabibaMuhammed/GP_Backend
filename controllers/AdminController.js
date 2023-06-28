@@ -23,26 +23,19 @@ const addLabcontent = async (req, res) => {
     if (!req.file) {
       return res.status(404).json({ message: "File not provided", error });
     }
-    const {
-      name,
-      key:headers,
-     
-      key:headers_content,
-     
-    } = req.body;
+    const { name, headers, headers_content } = req.body;
 
     var Containers = req.file.path;
-console.log(headers);
-console.log(headers_content);
-    const lab = {
-      Containers,
-      key:headers,
-     
-      key:headers_content,
-    };
+
+    const newheaders = headers.split(",");
+    const newheaders_content = headers_content.split(",");
+
     let labs = await LabsModel.findOne({ name: name });
-    if (!labs) return res.status(404).json({ message: "Lab aren't exist" }); 
-    await LabsModel.updateMany({ name: req.body.name }, lab);
+    if (!labs) return res.status(404).json({ message: "Lab aren't exist" });
+    await LabsModel.updateOne(
+      { name: req.body.name },
+      { headers: newheaders, headers_content: newheaders_content, Containers }
+    );
 
     return res
       .status(200)
