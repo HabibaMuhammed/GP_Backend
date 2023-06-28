@@ -2,11 +2,18 @@ const mongoose = require("mongoose");
 
 const SolvedlabsSchema = new mongoose.Schema(
   {
-     lab_id:{type: mongoose.Schema.Types.ObjectId, ref: "Labs", required: true},
+    lab_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Labs",
+      required: true,
+    },
 
-     user_id:{type: mongoose.Schema.Types.ObjectId, ref: "Users", required: true},
-     Status: { type: String, required: true,default:"Unsolved" },
-     
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
+    Status: { type: String, required: true, default: "Unsolved" },
   },
 
   { timestamps: true }
@@ -14,4 +21,4 @@ const SolvedlabsSchema = new mongoose.Schema(
 
 const SolvedlabsModel = mongoose.model("SolvedLabs", SolvedlabsSchema);
 
-module.exports=SolvedlabsModel
+module.exports = SolvedlabsModel;

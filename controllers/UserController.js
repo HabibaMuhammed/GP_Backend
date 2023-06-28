@@ -5,6 +5,8 @@ const UserModel = require("../DB/models/UserModel");
 const RandomString = require("randomstring");
 const SolvedLabs = require("../DB/models/Solvedlabs");
 const { myEmail } = require("../Services/SendEmail");
+const escapeHtml = require('escape-html');
+
 let register = async (req, res) => {
   try {
     if (
@@ -15,6 +17,7 @@ let register = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
+    let safeemail = escapeHtml(req.body.email);
 
     let user = await User.findOne({ email: req.body.email });
 
@@ -22,11 +25,12 @@ let register = async (req, res) => {
       return res.status(409).json({ message: "User already registered" });
     let salt = await bcrypt.genSalt(10);
     let hashedPswd = await bcrypt.hash(req.body.password, salt);
-
+    let safefirstname = escapeHtml(req.body.firstName);
+    let safelastname = escapeHtml(req.body.lastname);
     user = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
+      firstName: safefirstname,
+      lastName: safelastname,
+      email: safeemail,
       password: hashedPswd,
     });
     await user.save();
@@ -42,10 +46,13 @@ const updateUser = async (req, res) => {
   try {
     const { name, email, Location, Birthday } = req.body;
     const { id } = req.user;
-
+    let safename = escapeHtml(name);
+    let safeemail = escapeHtml(email);
+    let safeloc = escapeHtml(Location);
+    let safeBirthday = escapeHtml(Birthday);
     let user = await UserModel.updateOne(
       { _id: id },
-      { firstName: name, email, Location, Birthday }
+      { firstName: safename, email:safeemail, Location:safeloc, Birthday:safeBirthday }
     );
 
     if (user.matchedCount) {
@@ -56,8 +63,9 @@ const updateUser = async (req, res) => {
     res.status(400).json(error.message);
   }
 };
-let login = async (req, res) => {
-  let user = await User.findOne({ email: req.body.email });
+let login = async (req, res) => {    
+  let safeemail = escapeHtml(req.body.email);
+  let user = await User.findOne({ email: safeemail});
   if (!user) return res.status(400).json({ message: "User not registered" });
 
   const validPass = await bcrypt.compare(req.body.password, user.password);
@@ -101,9 +109,8 @@ const updatePassword = async (req, res) => {
 const deleteUser = async (req, res) => {
   const id = req.user.id;
   try {
-
     const user = await User.findByIdAndDelete(id);
-   if (!user) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json({ message: "User Deleted successfully" });
@@ -117,7 +124,7 @@ const fetchRecentChallenges = async (req, res) => {
   try {
     const recentlabs = await SolvedLabs.find({ user_id: id, Status: "Success" })
       .select({
-        time_stamps:0,
+        time_stamps: 0,
         user_id: 0,
         _id: 0,
         Status: 0,
@@ -132,8 +139,10 @@ const fetchRecentChallenges = async (req, res) => {
   }
 };
 const sendCode = async (req, res) => {
+
   const { email } = req.body;
-  const user = await UserModel.findOne({ email }).select("email");
+  let safeemail = escapeHtml(email);
+  const user = await UserModel.findOne({ safeemail }).select("email");
   if (!user) {
     res.status(404).json({ message: "Not register account" });
   } else {
@@ -143,7 +152,10 @@ const sendCode = async (req, res) => {
     });
 
     await UserModel.findByIdAndUpdate(user._id, { Authcode: accessCode });
-    myEmail(user.email, `<h1>"Need a new password? We'll help you get one in just a few minutes."</h1><h2>access code :  ${accessCode} </h2>`);
+    myEmail(
+      user.email,
+      `<h1>"Need a new password? We'll help you get one in just a few minutes."</h1><h2>access code :  ${accessCode} </h2>`
+    );
     res.status(200).json({ message: "Done check ur email" });
   }
 };
@@ -166,13 +178,30 @@ const Performance = async (req, res) => {
   const id = req.user._id;
 
   try {
-    const labs = await SolvedLabs.find({ user_id: id}).select({
+    const labs = await SolvedLabs.find({ user_id: id }).select({
       user_id: 0,
       _id: 0,
+      lab_id: 0,
       createdAt: 0,
       __v: 0,
     });
-    res.status(200).json({ labs });
+    const map = new Map();
+    for (let index = 0; index < labs.length; index++) {
+      let element = labs[index];
+      let date = element.updatedAt;
+      date = date.toString().split(" ");
+      const [weekDay, month, day] = date;
+      date = weekDay + "-" + month + "-" + day;
+      if (map.has(date)) {
+        let value = map.get(date);
+        if ((element.Status == "Success")) map.set(date, value + 1);
+      } else {
+        if ((element.Status == "Success")) map.set(date, 1);
+        else map.set(date, 0);
+      }
+    }
+    let maps=Object.fromEntries(map);
+    res.status(200).json(maps);
   } catch (error) {
     res.status(403).json(error.message);
   }
@@ -204,4 +233,5 @@ module.exports = {
   sendCode,
   validateAuthcode,
   forgetPassword,
-  Performance};
+  Performance,
+};

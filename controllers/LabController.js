@@ -1,6 +1,7 @@
 const LabsModel = require("../DB/models/LabsModel");
 const SolvedlabsModel=require("../DB/models/Solvedlabs");
 const jwt = require("jsonwebtoken");
+
 const numberOfSolvedLabs = async (req, res) => {  //zy recent challenge
   try {
     const Solvedlab = await SolvedlabsModel.find({
@@ -32,9 +33,10 @@ const updateSolvedlab = async (req, res) => {
     } else {
       status = "Failed";
     }
+    
 
     await SolvedlabsModel.updateOne({ _id: Solvedlab._id }, { Status: status });
-
+    
     res.status(200).json({ message: status });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
@@ -43,7 +45,10 @@ const updateSolvedlab = async (req, res) => {
 const addSolvedlab = async (req, res) => {
   try {
     const {labid,flag } = req.body;
-    
+   
+
+
+
     const Solvedlab = await SolvedlabsModel.findOne({
       lab_id: labid,
       user_id: req.user._id,
@@ -53,7 +58,8 @@ const addSolvedlab = async (req, res) => {
     const lab = await LabsModel.findOne({ _id: labid });
 
     let status = "Unsolved";
-  
+    
+    
 
     if (lab.Flag == flag) {
       status = "Success";
@@ -69,6 +75,7 @@ const addSolvedlab = async (req, res) => {
       lab_id: labid,
       user_id: req.user._id,
       Status: status,
+      
     });
 
     res.status(200).json({ message: status });
@@ -81,20 +88,6 @@ const Fetchlabs = async (req, res) => {
     let labs = await LabsModel.find().select({ name: 1, _id: 1,icon:1});
     if (!labs) return res.status(400).json({ message: "No Labs" });
     res.status(200).json({labs});
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error });
-  }
-};
-const searchLab = async (req, res) => {
-  try {
-    const name = req.body.name;
-
-    let labs = await LabsModel.findOne({ name: name }).select({
-      name: 1,
-      _id: 0,
-    });
-    if (!labs) return res.status(400).json({ message: "No Lab with this name exist" });
-    res.status(200).json({ labs });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
@@ -123,6 +116,5 @@ module.exports = {
   addSolvedlab,
   updateSolvedlab,
   numberOfSolvedLabs,
-  Fetchlabs,
-  searchLab,
+  Fetchlabs
 };
