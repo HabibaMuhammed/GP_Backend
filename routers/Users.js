@@ -6,8 +6,6 @@ const {
   validatorMiddleware,
   getCurrentUser,
 } = require("../middlewares/UserMW");
-
-//router.get("/", UserController.getAll);
 router.post("/register", validatorMiddleware, UserController.register);
 router.patch("/update", getCurrentUser, UserController.updateUser);
 router.patch("/updatePassword", getCurrentUser, UserController.updatePassword);

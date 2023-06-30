@@ -8,18 +8,17 @@ const adminroute = require("./routers/Admin");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
-const csrf = require('csurf')
-const cookieParser = require('cookie-parser')
+const csrf = require('csurf');
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 100 
 });
 
 app.use(limiter);
 dotenv.config();
 app.use(cors());
 const csrfProtection = csrf({ cookie: true});
-app.use(cookieParser())
+
 app.get('/csrf', csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() })
 })
@@ -32,7 +31,6 @@ connect_DB();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 
 
 app.use(mongoSanitize());

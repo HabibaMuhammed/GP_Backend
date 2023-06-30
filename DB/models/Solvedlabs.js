@@ -14,6 +14,7 @@ const SolvedlabsSchema = new mongoose.Schema(
       required: true,
     },
     Status: { type: String, required: true, default: "Unsolved" },
+    time:{type:String}
   },
 
   { timestamps: true }
