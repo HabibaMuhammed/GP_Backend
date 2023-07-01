@@ -1,5 +1,5 @@
 const multer = require("multer");
-const path=require("path");
+const path = require("path");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./Container");
@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
 });
 const fileFilter = (req, file, callback) => {
   var ext = path.extname(file.originalname);
-  if (ext !== ".rar" && ext !== ".zip") {
+  if (ext !== ".rar" && ext !== ".zip" && ext !== ".pka" && ext !== ".pkz") {
     return callback(new Error("Only images are allowed"));
   }
   callback(null, true);

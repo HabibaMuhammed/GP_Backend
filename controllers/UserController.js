@@ -5,7 +5,7 @@ const UserModel = require("../DB/models/UserModel");
 const RandomString = require("randomstring");
 const SolvedLabs = require("../DB/models/Solvedlabs");
 const { myEmail } = require("../Services/SendEmail");
-const escapeHtml = require('escape-html');
+const escapeHtml = require("escape-html");
 
 let register = async (req, res) => {
   try {
@@ -26,7 +26,8 @@ let register = async (req, res) => {
     let salt = await bcrypt.genSalt(10);
     let hashedPswd = await bcrypt.hash(req.body.password, salt);
     let safefirstname = escapeHtml(req.body.firstName);
-    let safelastname = escapeHtml(req.body.lastname);
+    let safelastname = escapeHtml(req.body.lastName);
+    console.log(safelastname);
     user = new User({
       firstName: safefirstname,
       lastName: safelastname,
@@ -46,26 +47,55 @@ const updateUser = async (req, res) => {
   try {
     const { name, email, Location, Birthday } = req.body;
     const { id } = req.user;
-    let safename = escapeHtml(name);
-    let safeemail = escapeHtml(email);
-    let safeloc = escapeHtml(Location);
-    let safeBirthday = escapeHtml(Birthday);
-    let user = await UserModel.updateOne(
-      { _id: id },
-      { firstName: safename, email:safeemail, Location:safeloc, Birthday:safeBirthday }
-    );
+
+    let user = await UserModel.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let updatedFields = {};
+
+    // Check if each field is empty and update the corresponding field with the old value
+    if (!name) {
+      updatedFields.firstName = user.firstName;
+    } else {
+      updatedFields.firstName = escapeHtml(name);
+    }
+
+    if (!email) {
+      updatedFields.email = user.email;
+    } else {
+      updatedFields.email = escapeHtml(email);
+    }
+
+    if (!Location) {
+      updatedFields.Location = user.Location;
+    } else {
+      updatedFields.Location = escapeHtml(Location);
+    }
+
+    if (!Birthday) {
+      updatedFields.Birthday = user.Birthday;
+    } else {
+      updatedFields.Birthday = escapeHtml(Birthday);
+    }
+
+    user = await UserModel.updateOne({ _id: id }, updatedFields);
 
     if (user.matchedCount) {
       return res.status(200).json({ message: "User Updated" });
     }
+
     res.status(404).json({ message: "User not found" });
   } catch (error) {
     res.status(400).json(error.message);
   }
 };
-let login = async (req, res) => {    
+
+let login = async (req, res) => {
   let safeemail = escapeHtml(req.body.email);
-  let user = await User.findOne({ email: safeemail});
+  let user = await User.findOne({ email: safeemail });
   if (!user) return res.status(400).json({ message: "User not registered" });
 
   const validPass = await bcrypt.compare(req.body.password, user.password);
@@ -122,7 +152,10 @@ const fetchRecentChallenges = async (req, res) => {
   const id = req.user._id;
 
   try {
-    const recentlabs = await SolvedLabs.find({ user_id: id, Status: "Success" })
+    const recent_labs = await SolvedLabs.find({
+      user_id: id,
+      Status: "Success",
+    })
       .select({
         time_stamps: 0,
         user_id: 0,
@@ -133,16 +166,16 @@ const fetchRecentChallenges = async (req, res) => {
         __v: 0,
       })
       .populate([{ path: "lab_id", select: { name: 1, icon: 1 } }]);
+    const recentlabs = recent_labs.reverse();
     res.status(200).json({ recentlabs });
   } catch (error) {
     res.status(403).json(error.message);
   }
 };
 const sendCode = async (req, res) => {
-
   const { email } = req.body;
   let safeemail = escapeHtml(email);
-  const user = await UserModel.findOne({ safeemail }).select("email");
+  const user = await UserModel.findOne({ email: safeemail }).select("email");
   if (!user) {
     res.status(404).json({ message: "Not register account" });
   } else {
@@ -194,13 +227,13 @@ const Performance = async (req, res) => {
       date = weekDay + "-" + month + "-" + day;
       if (map.has(date)) {
         let value = map.get(date);
-        if ((element.Status == "Success")) map.set(date, value + 1);
+        if (element.Status == "Success") map.set(date, value + 1);
       } else {
-        if ((element.Status == "Success")) map.set(date, 1);
+        if (element.Status == "Success") map.set(date, 1);
         else map.set(date, 0);
       }
     }
-    let maps=Object.fromEntries(map);
+    let maps = Object.fromEntries(map);
     res.status(200).json(maps);
   } catch (error) {
     res.status(403).json(error.message);

@@ -5,10 +5,10 @@ const addLab = async (req, res) => {
     if (!req.file) {
       return res.status(404).json({ message: "File not provided", error });
     }
-    const { name, diffculty, numberofsolving, Flag } = req.body;
+    const { name,Flag } = req.body;
     var icon = req.file.path;
 
-    const lab = { name, icon, diffculty, numberofsolving, Flag };
+    const lab = { name, icon, Flag };
     let labs = await LabsModel.findOne({ name: req.body.name });
     if (labs) return res.status(409).json({ message: "Lab already exist" });
     await LabsModel.create(lab);
