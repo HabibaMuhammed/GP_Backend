@@ -10,7 +10,7 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const csrf = require('csurf');
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 30 * 60 * 1000, 
   max: 100 
 });
 
