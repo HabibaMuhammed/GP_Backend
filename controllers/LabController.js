@@ -104,8 +104,9 @@ const Fetchonelab = async (req, res) => {
       Flag: 0,
       numberofsolving: 0,
     });
+    
     if (!labs) return res.status(404).json({ message: "No Lab is founded" });
-    return res.status(200).json({ labs });
+    return res.status(200).json({ labs});
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
   }
