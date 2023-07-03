@@ -10,18 +10,18 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const csrf = require('csurf');
 const limiter = rateLimit({
-  windowMs: 30 * 60 * 1000, 
+  windowMs: 220 * 60 * 1000, 
   max: 100 
 });
 
 app.use(limiter);
 dotenv.config();
 app.use(cors());
-const csrfProtection = csrf({ cookie: true});
+// const csrfProtection = csrf({ cookie: true});
 
-app.get('/csrf', csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() })
-})
+// app.get('/csrf', csrfProtection, (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() })
+// })
 app.use(express.urlencoded({ extended: false }));
 app.use("/Container", express.static("./Container"));
 app.use("/Labsicon", express.static("./Labsicon"));
